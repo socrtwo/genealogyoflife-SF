@@ -1,0 +1,34 @@
+*** This file is better viewed when word wrapping is on ***
+
+'Note - to recreate the database with "Species 2000" records, perform following data linking, inserting and cleaning up operations:
+'
+'1. Download Life2008 iso image "AnnualChecklist2008.iso" and install. You may use tool like "Virtual CD" to directly install from your harddisk and without burning a CD ROM.
+'2. Install MySQL 5.0
+'3. Run "C:\Program Files\Catalogue of Life\2008 Annual Checklist\microweb.exe"
+'4. Run All Programs > MySQL > MySQL System Tray Monitor
+'5. Edit "C:\Program Files\MySQL\MySQL Server 5.0\my.ini" file and set 
+'
+'datadir="C:/Program Files/Catalogue of Life/2008 Annual Checklist/mysql/data"
+'
+'6. Right click on MySQL System Tray Monitor and click on MySQL Query Browser
+'7. Stored Connection - enter a name - You may enter "Col2008ac"
+'
+'Server = Col2008ac
+'Port=3000
+'username=root
+'password=nil
+'Default schema=col2008ac
+'
+'click on [OK]
+'
+'(see the picture "Life2008-Connection.PNG" for further connection detail)
+'
+'8. Open MS Access 2000/2003 database "Life2008-v1.mdb". Check that link to [taxa] table of MySQL database is working.
+'9. Delete all previous records. Run query [Sp2000-Delete_all_taxa_s2k(be careful)], Run query [Sp2000-Insert_all_taxa_s2k(from MySQL)].
+'10. Delete all [Parent] table records. Run query [Sp2000-Insert_all_parent]
+'12. Delete all [Parent-not-found] table records. Run query [Sp2000-parent-not-found-query], if any parent shows off, copy and paste it into [parent-not-found] table.
+'13. Check whether any new kingdom is added or not (very unlikely though). Run query [Sp2000-show kingdoms] and comapre the output with [Kingdoms] table.
+'14. Run query [Sp2000-update grand1pa] to [Sp2000-update grand7pa] and at last run query [Sp2000-update parent's kingdom].
+'15. Press CTRL+G, Change file name (sFile) etc (here: ****** CHANGE FILE NAME HERE *) in the "Genealogy" VBA module of the MS Access database. Set "bTesting = False" when you want to create big GED file with all 2 million entries. "bTesting = True" will create GED file with top 100 entries. If you want this top 100 entries you may have to delete existing top100 tables (Top100 and Top100family) and copy from corresponding queries.
+'16. Type in "ExportGED" in the immediate window and press enter. This will start creating the GED file specified in the sFile variable in step 15.
+'
