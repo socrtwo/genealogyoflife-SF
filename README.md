@@ -1,9 +1,18 @@
-# Genealogy of Life
+<!--MODERNIZED:v1-->
+# Genealogyoflife
 
-<!--PAGES_LINK_BANNER-->
-> 🌐 **Live page:** [https://socrtwo.github.io/genealogyoflife-SF/](https://socrtwo.github.io/genealogyoflife-SF/)  
-> 📦 **Releases:** [github.com/socrtwo/genealogyoflife-SF/releases](https://github.com/socrtwo/genealogyoflife-SF/releases)
-<!--/PAGES_LINK_BANNER-->
+> Migrated from SourceForge via SF2GH Migrator
+
+[![Live page](https://img.shields.io/badge/live-page-ff2e93?style=for-the-badge)](https://socrtwo.github.io/genealogyoflife-SF/)
+[![Releases](https://img.shields.io/github/v/release/socrtwo/genealogyoflife-SF?style=for-the-badge&color=7c3aed)](https://github.com/socrtwo/genealogyoflife-SF/releases)
+[![License](https://img.shields.io/github/license/socrtwo/genealogyoflife-SF?style=for-the-badge&color=22d3ee)](https://github.com/socrtwo/genealogyoflife-SF/blob/main/LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/socrtwo/genealogyoflife-SF?style=for-the-badge&color=34d399)](https://github.com/socrtwo/genealogyoflife-SF/commits)
+
+🌐 **Live:** https://socrtwo.github.io/genealogyoflife-SF/  
+📦 **Downloads:** [Releases](https://github.com/socrtwo/genealogyoflife-SF/releases)  
+📂 **Source:** [socrtwo/genealogyoflife-SF](https://github.com/socrtwo/genealogyoflife-SF)
+
+---
 
 A genealogy dataset combining the Catalogue of Life taxonomy with traditional genealogy formats. Represents the tree of life as a navigable family tree.
 
@@ -53,3 +62,25 @@ Contributions are welcome! Feel free to:
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+## 📜 SourceForge heritage
+
+This project originated on **SourceForge** before being migrated to GitHub. The legacy SourceForge entry, if still available, can be searched at:
+
+🔗 https://sourceforge.net/projects/genealogyoflife/
+
+The repository here at `socrtwo/genealogyoflife-SF` is the canonical, actively-maintained home. All future updates, issue tracking, and releases happen on GitHub.
+
+## 🛠️ Contributing
+
+Issues and pull requests are welcome at [https://github.com/socrtwo/genealogyoflife-SF/issues](https://github.com/socrtwo/genealogyoflife-SF/issues).
+
+## 📝 License
+
+See the [LICENSE](https://github.com/socrtwo/genealogyoflife-SF/blob/main/LICENSE) file in this repository. If no license file is present, the project is shared as-is for reference and personal use; please contact the maintainer for other use cases.
+
+---
+
+*Maintained by [@socrtwo](https://github.com/socrtwo)*
