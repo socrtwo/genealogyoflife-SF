@@ -1,5 +1,10 @@
 # Genealogy of Life
 
+<!--PAGES_LINK_BANNER-->
+> 🌐 **Live page:** [https://socrtwo.github.io/genealogyoflife-SF/](https://socrtwo.github.io/genealogyoflife-SF/)  
+> 📦 **Releases:** [github.com/socrtwo/genealogyoflife-SF/releases](https://github.com/socrtwo/genealogyoflife-SF/releases)
+<!--/PAGES_LINK_BANNER-->
+
 A genealogy dataset combining the Catalogue of Life taxonomy with traditional genealogy formats. Represents the tree of life as a navigable family tree.
 
 **Language:** GEDCOM Data  
