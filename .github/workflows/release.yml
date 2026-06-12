@@ -1,0 +1,255 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v2008.1)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build platform bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            tag="${GITHUB_REF_NAME}"
+          else
+            tag="${{ inputs.tag }}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Releasing $tag"
+
+      - name: Download the database from the v2008 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release download v2008 --pattern 'Database-With-2008-Data.zip'
+          ls -la Database-With-2008-Data.zip
+
+      - name: Build platform bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.tag.outputs.tag }}"
+          mkdir -p dist build/stage
+
+          stage_common() {
+            local stage="$1"
+            cp Database-With-2008-Data.zip      "$stage/"
+            cp Conversion-Instructions.txt      "$stage/"
+            cp Life2008-Connection.PNG          "$stage/"
+            cp LICENSE                          "$stage/"
+            cp README.md                        "$stage/PROJECT-README.md"
+          }
+
+          make_zip() {
+            local id="$1"
+            local stage="build/stage/$id"
+            (cd build/stage && zip -qr "../../dist/genealogyoflife-${id}-${TAG}.zip" "$id")
+            ls -la "dist/genealogyoflife-${id}-${TAG}.zip"
+          }
+
+          common_intro() {
+            local stage="$1"; local pretty="$2"
+            printf '%s\n' \
+              "# Genealogy of Life — $pretty" \
+              '' \
+              'This bundle contains the Genealogy of Life dataset:' \
+              '' \
+              '- Database-With-2008-Data.zip — zipped Microsoft Access (.mdb) database' \
+              '  built from the Catalogue of Life 2008 Annual Checklist.' \
+              '- Conversion-Instructions.txt — how the database was built and how to' \
+              '  regenerate the GEDCOM export.' \
+              '- Life2008-Connection.PNG — MySQL connection settings screenshot' \
+              '  referenced by the instructions.' \
+              '' \
+              'Unzip Database-With-2008-Data.zip first to get the .mdb file.' \
+              '' \
+              > "$stage/INSTALL.md"
+          }
+
+          # ---------------- Windows ----------------
+          stage="build/stage/windows"; mkdir -p "$stage"; stage_common "$stage"
+          common_intro "$stage" "Windows"
+          printf '%s\n' \
+            '## Open the database on Windows' \
+            '' \
+            '1. Unzip Database-With-2008-Data.zip.' \
+            '2. Open the .mdb file with Microsoft Access (2000 or later), or' \
+            '3. Use the free LibreOffice Base (https://www.libreoffice.org/):' \
+            '   File -> Open -> select the .mdb file, or connect via' \
+            '   "Connect to an existing database" -> Microsoft Access.' \
+            '' \
+            'To regenerate the GEDCOM export, follow Conversion-Instructions.txt' \
+            '(requires Microsoft Access with VBA and MySQL 5.0).' \
+            >> "$stage/INSTALL.md"
+          make_zip windows
+
+          # ---------------- macOS ----------------
+          stage="build/stage/macos"; mkdir -p "$stage"; stage_common "$stage"
+          common_intro "$stage" "macOS"
+          printf '%s\n' \
+            '## Open the database on macOS' \
+            '' \
+            '1. Unzip Database-With-2008-Data.zip.' \
+            '2. Install LibreOffice (https://www.libreoffice.org/).' \
+            '3. In LibreOffice Base choose "Connect to an existing database" ->' \
+            '   Microsoft Access, and select the .mdb file.' \
+            '' \
+            'Tools such as MDB ACCDB Viewer (App Store) also open .mdb files.' \
+            'The VBA regeneration procedure in Conversion-Instructions.txt is' \
+            'Windows-only (requires Microsoft Access).' \
+            >> "$stage/INSTALL.md"
+          make_zip macos
+
+          # ---------------- Linux ----------------
+          stage="build/stage/linux"; mkdir -p "$stage"; stage_common "$stage"
+          common_intro "$stage" "Linux"
+          printf '%s\n' \
+            '## Open the database on Linux' \
+            '' \
+            '1. Unzip Database-With-2008-Data.zip.' \
+            '2. Install LibreOffice Base (e.g. "sudo apt install libreoffice-base").' \
+            '3. In Base choose "Connect to an existing database" -> Microsoft Access,' \
+            '   and select the .mdb file.' \
+            '' \
+            'Command-line alternative: mdbtools ("sudo apt install mdbtools"), e.g.' \
+            '"mdb-tables file.mdb" and "mdb-export file.mdb <table>".' \
+            'The VBA regeneration procedure in Conversion-Instructions.txt is' \
+            'Windows-only (requires Microsoft Access).' \
+            >> "$stage/INSTALL.md"
+          make_zip linux
+
+          # ---------------- ChromeOS ----------------
+          stage="build/stage/chromeos"; mkdir -p "$stage"; stage_common "$stage"
+          common_intro "$stage" "ChromeOS"
+          printf '%s\n' \
+            '## Open the database on ChromeOS' \
+            '' \
+            '1. Enable Linux (Crostini): Settings -> Advanced -> Developers ->' \
+            '   Linux development environment.' \
+            '2. In the Linux terminal: "sudo apt install libreoffice-base".' \
+            '3. Unzip Database-With-2008-Data.zip into the Linux files folder.' \
+            '4. In LibreOffice Base choose "Connect to an existing database" ->' \
+            '   Microsoft Access, and select the .mdb file.' \
+            '' \
+            'Project page: https://socrtwo.github.io/genealogyoflife-SF/' \
+            >> "$stage/INSTALL.md"
+          make_zip chromeos
+
+          # ---------------- Android ----------------
+          stage="build/stage/android"; mkdir -p "$stage"; stage_common "$stage"
+          common_intro "$stage" "Android"
+          printf '%s\n' \
+            '## Open the database on Android' \
+            '' \
+            '1. Unzip Database-With-2008-Data.zip (the Files app can unzip).' \
+            '2. Install an MDB viewer from Google Play, for example' \
+            '   "MDB Viewer Plus" or "Access Database Manager" (search for' \
+            '   "mdb viewer").' \
+            '3. Open the .mdb file from the viewer app.' \
+            '' \
+            'Regenerating the GEDCOM export requires Microsoft Access on Windows;' \
+            'see Conversion-Instructions.txt.' \
+            '' \
+            'Project page: https://socrtwo.github.io/genealogyoflife-SF/' \
+            >> "$stage/INSTALL.md"
+          make_zip android
+
+          # ---------------- iOS ----------------
+          stage="build/stage/ios"; mkdir -p "$stage"; stage_common "$stage"
+          common_intro "$stage" "iOS / iPadOS"
+          printf '%s\n' \
+            '## Open the database on iPhone / iPad' \
+            '' \
+            '1. Unzip Database-With-2008-Data.zip (the Files app can unzip).' \
+            '2. Install an MDB viewer from the App Store, for example' \
+            '   "MDB ACCDB Viewer" or another app found by searching "mdb viewer".' \
+            '3. Open the .mdb file from the viewer app via the Files app.' \
+            '' \
+            'Regenerating the GEDCOM export requires Microsoft Access on Windows;' \
+            'see Conversion-Instructions.txt.' \
+            '' \
+            'Project page: https://socrtwo.github.io/genealogyoflife-SF/' \
+            >> "$stage/INSTALL.md"
+          make_zip ios
+
+          # ---------------- Web ----------------
+          stage="build/stage/web"; mkdir -p "$stage"; stage_common "$stage"
+          cp web/index.html "$stage/"
+          common_intro "$stage" "Web"
+          printf '%s\n' \
+            '## Use on the Web' \
+            '' \
+            'The project page with documentation is hosted at:' \
+            '' \
+            '    https://socrtwo.github.io/genealogyoflife-SF/' \
+            '' \
+            'index.html in this bundle is the same page; open it in any browser.' \
+            'The .mdb database itself is a desktop file format — download a' \
+            'desktop bundle (windows / macos / linux) or use the viewers listed' \
+            'in the android / ios bundles to browse it.' \
+            >> "$stage/INSTALL.md"
+          make_zip web
+
+          ls -la dist/
+
+      - name: Generate SHA-256 checksums
+        run: |
+          cd dist
+          sha256sum *.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Upload artifacts (for inspection)
+        uses: actions/upload-artifact@v4
+        with:
+          name: genealogyoflife-bundles-${{ steps.tag.outputs.tag }}
+          path: dist/
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          body: |
+            Multi-platform release of **Genealogy of Life**.
+
+            Every bundle contains the zipped Microsoft Access database
+            (`Database-With-2008-Data.zip`), the regeneration instructions
+            (`Conversion-Instructions.txt`), the MySQL connection screenshot,
+            and platform-specific install/open instructions in `INSTALL.md`.
+
+            | Platform | Asset |
+            |---|---|
+            | Windows  | `genealogyoflife-windows-*.zip` |
+            | macOS    | `genealogyoflife-macos-*.zip` |
+            | Linux    | `genealogyoflife-linux-*.zip` |
+            | ChromeOS | `genealogyoflife-chromeos-*.zip` |
+            | Android  | `genealogyoflife-android-*.zip` |
+            | iOS      | `genealogyoflife-ios-*.zip` |
+            | Web      | `genealogyoflife-web-*.zip` |
+
+            **Project page:** https://socrtwo.github.io/genealogyoflife-SF/
+
+            SHA-256 checksums for every asset are in `SHA256SUMS.txt`.
+          files: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
